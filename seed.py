@@ -44,8 +44,10 @@ def seed():
     load_dotenv()
     
     # Aseguramos que el pool esté abierto si lo usamos fuera de FastAPI
-    if not pool.opened:
+    try:
         pool.open()
+    except Exception:
+        pass
 
     with pool.connection() as conn:
         with conn.transaction():
