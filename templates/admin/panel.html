@@ -1,0 +1,49 @@
+{% extends "base_admin.html" %}
+{% block title %}Panel de Control{% endblock %}
+
+{% block content %}
+<div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 0;">
+    <div class="card">
+        <h3 style="color: var(--text-secondary); font-size: 14px; text-transform: uppercase;">Reservas de hoy</h3>
+        <p style="font-size: 32px; font-weight: bold; color: var(--cpim-primary-dark); margin-top: 10px;">{{ reservas_hoy }}</p>
+    </div>
+    <!-- Otros indicadores rápidos pueden ir acá en el futuro -->
+</div>
+
+<h3 style="margin-top: 40px; margin-bottom: 20px; color: var(--cpim-primary-dark);">Próximas ocupaciones</h3>
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: var(--surface-secondary);">
+            <tr>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Fecha</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Horario</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Salón</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Ocupación</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Tipo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in proximas %}
+            <tr>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ p.fecha }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    {% if p.hora_inicio %}{{ p.hora_inicio.strftime('%H:%M') }} - {{ p.hora_fin.strftime('%H:%M') }}{% else %}Día completo{% endif %}
+                </td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ p.salon }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ p.titulo }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; 
+                        background: {% if p.tipo == 'RESERVA' %}var(--cpim-primary-soft); color: var(--cpim-primary){% else %}var(--warning-soft); color: var(--warning){% endif %}">
+                        {{ p.tipo }}
+                    </span>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="padding: 20px; text-align: center; color: var(--text-secondary);">No hay ocupaciones próximas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

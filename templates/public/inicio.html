@@ -1,0 +1,27 @@
+{% extends "base_public.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <h2>Espacios para encuentros, capacitación y eventos.</h2>
+        <p>Conocé nuestros salones, su equipamiento y consultá disponibilidad en tiempo real.</p>
+        <a href="/disponibilidad" class="btn btn-primary">Consultar disponibilidad</a>
+    </div>
+</section>
+
+<section class="container">
+    <div class="grid">
+        {% for salon in salones %}
+        <div class="card">
+            <h3 class="card-title">{{ salon.nombre }}</h3>
+            <p style="font-weight: 500; margin-bottom: 10px;">Capacidad: {{ salon.capacidad }} personas</p>
+            <p class="card-desc">{{ salon.descripcion }}</p>
+            <div class="card-actions">
+                <a href="/salones/{{ salon.slug }}" class="btn btn-secondary">Ver salón</a>
+                <a href="/disponibilidad?salon={{ salon.id }}" class="btn btn-primary">Consultar fechas</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

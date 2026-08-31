@@ -1,0 +1,56 @@
+{% extends "base_admin.html" %}
+{% block title %}Agenda Institucional{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div></div>
+    <a href="/admin/agenda/nuevo" class="btn btn-primary">+ Nuevo Evento</a>
+</div>
+
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: var(--surface-secondary);">
+            <tr>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Fecha</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Horario</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Título</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Salón</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Estado</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for e in eventos %}
+            <tr>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ e.fecha }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    {% if e.hora_inicio %}{{ e.hora_inicio.strftime('%H:%M') }} - {{ e.hora_fin.strftime('%H:%M') }}{% else %}Día completo{% endif %}
+                </td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    <strong>{{ e.titulo }}</strong><br>
+                    <small style="color: var(--text-secondary);">{{ e.tipo }}</small>
+                </td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ e.salon_nombre or '-' }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    {% if e.cancelado %}
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: var(--border); color: var(--text-secondary);">CANCELADO</span>
+                    {% else %}
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: var(--success-soft); color: var(--success);">ACTIVO</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    {% if not e.cancelado %}
+                    <form method="POST" action="/admin/agenda/{{ e.id }}/cancelar" style="display:inline;" onsubmit="return confirm('¿Cancelar este evento?');">
+                        <input type="hidden" name="csrf_token" value="{{ request.session.csrf_token }}">
+                        <button type="submit" class="btn" style="padding: 5px 10px; font-size: 12px; background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger);">Cancelar</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" style="padding: 20px; text-align: center; color: var(--text-secondary);">No hay eventos en la agenda.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

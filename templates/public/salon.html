@@ -1,0 +1,46 @@
+{% extends "base_public.html" %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div style="margin-bottom: 20px;">
+        <a href="/" style="color: var(--text-secondary);">&laquo; Volver al inicio</a>
+    </div>
+
+    <div style="background-color: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-sm);">
+        <h1 style="color: var(--cpim-primary-dark); font-size: 32px; margin-bottom: 10px;">{{ salon.nombre }}</h1>
+        <p style="font-size: 18px; color: var(--text-secondary); margin-bottom: 30px;">{{ salon.descripcion }}</p>
+        
+        <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <h3 style="margin-bottom: 15px;">Detalles</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>Capacidad:</strong> {{ salon.capacidad }} personas</li>
+                    {% if salon.usos %}
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--border);"><strong>Usos:</strong> {{ salon.usos }}</li>
+                    {% endif %}
+                </ul>
+
+                {% if equipamiento %}
+                <h3 style="margin-top: 30px; margin-bottom: 15px;">Equipamiento</h3>
+                <ul style="list-style: none; padding: 0;">
+                    {% for eq in equipamiento %}
+                    <li style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 10px; color: var(--success);">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        {{ eq.nombre }} {% if eq.cantidad %}({{ eq.cantidad }}){% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            
+            <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg); border-radius: var(--radius-md); padding: 40px; text-align: center;">
+                <h3 style="margin-bottom: 20px;">¿Te interesa este salón?</h3>
+                <p style="margin-bottom: 20px; color: var(--text-secondary);">Consultá los días libres y horarios disponibles en nuestro calendario público.</p>
+                <a href="/disponibilidad?salon={{ salon.id }}" class="btn btn-primary" style="width: 100%;">Ver disponibilidad</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

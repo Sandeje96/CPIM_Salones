@@ -1,0 +1,93 @@
+{% extends "base_admin.html" %}
+{% block title %}Nuevo Evento Institucional{% endblock %}
+
+{% block content %}
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 30px; max-width: 800px;">
+    {% if error %}
+    <div style="background: var(--danger-soft); color: var(--danger); padding: 15px; border-radius: var(--radius-sm); margin-bottom: 20px;">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/admin/agenda">
+        <input type="hidden" name="csrf_token" value="{{ request.session.csrf_token }}">
+        
+        <div class="form-group">
+            <label>Título *</label>
+            <input type="text" name="titulo" class="form-control" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label>Tipo *</label>
+                <select name="tipo" class="form-control" required>
+                    <option value="REUNION_COMISION">Reunión de Comisión Directiva</option>
+                    <option value="PLENARIA">Plenaria</option>
+                    <option value="CAPACITACION">Capacitación</option>
+                    <option value="CONVERSATORIO">Conversatorio</option>
+                    <option value="ACTO">Acto</option>
+                    <option value="REUNION_INTERNA">Reunión Interna</option>
+                    <option value="OTRO" selected>Otro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Salón (Opcional)</label>
+                <select name="salon_id" class="form-control">
+                    <option value="">-- Ninguno (Actividad sin salón) --</option>
+                    {% for s in salones %}
+                    <option value="{{ s.id }}">{{ s.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea name="descripcion" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label>Fecha *</label>
+                <input type="date" name="fecha" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>Hora inicio</label>
+                <input type="time" name="hora_inicio" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Hora fin</label>
+                <input type="time" name="hora_fin" class="form-control">
+            </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-top: -15px; margin-bottom: 20px;">Dejá las horas en blanco para bloquear el día completo.</p>
+
+        <h4 style="margin: 30px 0 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Recurrencia</h4>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label>Tipo de recurrencia</label>
+                <select name="recurrencia" class="form-control" id="recurrencia">
+                    <option value="UNA_VEZ">Una vez</option>
+                    <option value="SEMANAL">Semanal</option>
+                    <option value="MENSUAL">Mensual</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Repetir hasta (Fecha fin)</label>
+                <input type="date" name="fecha_fin_recurrencia" class="form-control" id="fecha_fin_recurrencia">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Observaciones</label>
+            <input type="text" name="observaciones" class="form-control">
+        </div>
+
+        <div style="margin-top: 30px; display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-primary">Guardar Evento</button>
+            <a href="/admin/agenda" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

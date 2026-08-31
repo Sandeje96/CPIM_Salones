@@ -1,0 +1,68 @@
+{% extends "base_admin.html" %}
+{% block title %}Reservas{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <!-- Filtros podrían ir aquí -->
+    </div>
+    {% if request.session.rol == 'ADMINISTRACION' %}
+    <a href="/admin/reservas/nueva" class="btn btn-primary">+ Nueva Reserva</a>
+    {% endif %}
+</div>
+
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: var(--surface-secondary);">
+            <tr>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Fecha</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Horario</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Salón</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Responsable</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Estado</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Pago</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in reservas %}
+            <tr>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ r.fecha }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ r.hora_inicio.strftime('%H:%M') }} - {{ r.hora_fin.strftime('%H:%M') }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ r.salon_nombre }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ r.responsable }}<br><small style="color: var(--text-secondary);">{{ r.telefono }}</small></td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: {% if r.estado_reserva == 'RESERVADO' %}var(--cpim-primary-soft); color: var(--cpim-primary){% else %}var(--border); color: var(--text-secondary){% endif %}">
+                        {{ r.estado_reserva }}
+                    </span>
+                </td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: {% if r.estado_pago == 'PAGADO' %}var(--success-soft); color: var(--success){% else %}var(--warning-soft); color: var(--warning){% endif %}">
+                        {{ r.estado_pago }}
+                    </span>
+                </td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                    {% if request.session.rol == 'ADMINISTRACION' %}
+                        {% if r.estado_pago != 'PAGADO' and r.estado_reserva != 'CANCELADO' %}
+                        <form method="POST" action="/admin/reservas/{{ r.id }}/pagar" style="display:inline;" onsubmit="return confirm('¿Marcar como pagado?');">
+                            <input type="hidden" name="csrf_token" value="{{ request.session.csrf_token }}">
+                            <button type="submit" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Pagar</button>
+                        </form>
+                        {% endif %}
+                        
+                        {% if r.estado_reserva != 'CANCELADO' %}
+                        <form method="POST" action="/admin/reservas/{{ r.id }}/cancelar" style="display:inline;" onsubmit="return confirm('¿Estás seguro de cancelar esta reserva?');">
+                            <input type="hidden" name="csrf_token" value="{{ request.session.csrf_token }}">
+                            <button type="submit" class="btn" style="padding: 5px 10px; font-size: 12px; background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger);">Cancelar</button>
+                        </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="7" style="padding: 20px; text-align: center; color: var(--text-secondary);">No hay reservas registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

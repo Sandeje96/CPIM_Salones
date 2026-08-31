@@ -1,0 +1,57 @@
+{% extends "base_public.html" %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div style="margin-bottom: 30px; text-align: center;">
+        <h1 style="color: var(--cpim-primary-dark); margin-bottom: 10px;">Consulta de Disponibilidad</h1>
+        <p style="color: var(--text-secondary);">Seleccioná un salón y explorá el calendario para ver los horarios libres.</p>
+    </div>
+
+    <div class="form-group" style="max-width: 400px; margin: 0 auto 30px;">
+        <label for="salon-select">Seleccionar salón:</label>
+        <select id="salon-select" class="form-control" onchange="window.location.href='/disponibilidad?salon=' + this.value">
+            <option value="">-- Elegir salón --</option>
+            {% for s in salones %}
+            <option value="{{ s.id }}" {% if salon_seleccionado|string == s.id|string %}selected{% endif %}>{{ s.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {% if salon_seleccionado %}
+    <div id="calendar-app" data-salon="{{ salon_seleccionado }}" data-whatsapp="{{ whatsapp }}">
+        <div class="calendar-wrapper">
+            <div class="calendar-header">
+                <button id="btn-prev-month" class="btn btn-secondary" aria-label="Mes anterior">&laquo; Anterior</button>
+                <h3 id="current-month-label" style="font-size: 20px; font-weight: 500;">Cargando...</h3>
+                <button id="btn-next-month" class="btn btn-secondary" aria-label="Mes siguiente">Siguiente &raquo;</button>
+            </div>
+            
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Lun</div>
+                <div class="calendar-day-header">Mar</div>
+                <div class="calendar-day-header">Mié</div>
+                <div class="calendar-day-header">Jue</div>
+                <div class="calendar-day-header">Vie</div>
+                <div class="calendar-day-header">Sáb</div>
+                <div class="calendar-day-header">Dom</div>
+                <!-- Días renderizados por JS -->
+            </div>
+            <div id="calendar-days" class="calendar-grid" style="margin-top: 10px;"></div>
+        </div>
+        
+        <div id="day-detail" class="disponibilidad-panel" style="display: none;">
+            <h3 id="detail-date" style="margin-bottom: 20px; font-size: 20px;"></h3>
+            <div id="detail-slots" style="margin-bottom: 30px;"></div>
+            
+            <div style="background-color: var(--cpim-primary-soft); padding: 20px; border-radius: var(--radius-sm); text-align: center;">
+                <p style="margin-bottom: 15px;">¿Querés consultar por este salón?</p>
+                <p style="margin-bottom: 20px; color: var(--text-secondary); font-size: 14px;">Comunicate con Administración del CPIM por WhatsApp indicando salón, fecha y horario.</p>
+                <a id="btn-whatsapp" href="#" target="_blank" class="btn btn-primary" style="display: inline-block; min-width: 250px;">Consultar por WhatsApp</a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/js/calendar.js"></script>
+    {% endif %}
+</div>
+{% endblock %}

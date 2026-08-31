@@ -1,0 +1,31 @@
+{% extends "base_admin.html" %}
+{% block title %}Historial de Actividad (Auditoría){% endblock %}
+
+{% block content %}
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead style="background: var(--surface-secondary);">
+            <tr>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Fecha y Hora</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Usuario</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Acción</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">Entidad</th>
+                <th style="padding: 15px 20px; border-bottom: 1px solid var(--border);">ID</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for l in logs %}
+            <tr>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px;">{{ l.creado_en.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px;">{{ l.usuario_nombre or 'Sistema' }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500;">{{ l.accion }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px;">{{ l.entidad }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border); font-size: 14px;">{{ l.entidad_id or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" style="padding: 20px; text-align: center; color: var(--text-secondary);">No hay registros en el historial.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base_admin.html" %}
+{% block title %}Configuración{% endblock %}
+
+{% block content %}
+<div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 30px; max-width: 800px;">
+    <form method="POST" action="/admin/configuracion">
+        <input type="hidden" name="csrf_token" value="{{ request.session.csrf_token }}">
+        
+        <h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Datos Institucionales Públicos</h4>
+        
+        <div class="form-group">
+            <label>Nombre de la institución</label>
+            <input type="text" name="nombre_institucion" class="form-control" value="{{ ajustes.get('nombre_institucion', '') }}">
+        </div>
+        
+        <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" name="direccion" class="form-control" value="{{ ajustes.get('direccion', '') }}">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label>WhatsApp (solo números y código de país)</label>
+                <input type="text" name="whatsapp" class="form-control" value="{{ ajustes.get('whatsapp', '') }}">
+            </div>
+            <div class="form-group">
+                <label>Teléfono (formato visible)</label>
+                <input type="text" name="telefono" class="form-control" value="{{ ajustes.get('telefono', '') }}">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Email de contacto</label>
+            <input type="email" name="email" class="form-control" value="{{ ajustes.get('email', '') }}">
+        </div>
+
+        <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+            <a href="/admin/exportar/reservas.csv" class="btn btn-secondary">Exportar Reservas (CSV)</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
