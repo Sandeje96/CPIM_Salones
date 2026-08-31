@@ -33,21 +33,21 @@ def health_check():
 @app.get("/")
 def inicio(request: Request, db: Connection = Depends(get_db)):
     salones = db.execute("SELECT id, slug, nombre, descripcion, capacidad FROM salones WHERE activo = TRUE ORDER BY orden").fetchall()
-    return templates.TemplateResponse("public/inicio.html", {"request": request, "salones": salones})
+    return templates.TemplateResponse(request=request, name="public/inicio.html", context={"request": request, "salones": salones})
 
 @app.get("/salones/{slug}")
 def salon_detalle(request: Request, slug: str, db: Connection = Depends(get_db)):
     salon = db.execute("SELECT * FROM salones WHERE slug = %s", (slug,)).fetchone()
     if not salon:
-        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+        return templates.TemplateResponse(request=request, name="404.html", context={"request": request}, status_code=404)
     equipamiento = db.execute("SELECT * FROM equipamiento WHERE salon_id = %s ORDER BY orden", (salon["id"],)).fetchall()
-    return templates.TemplateResponse("public/salon.html", {"request": request, "salon": salon, "equipamiento": equipamiento})
+    return templates.TemplateResponse(request=request, name="public/salon.html", context={"request": request, "salon": salon, "equipamiento": equipamiento})
 
 @app.get("/disponibilidad")
 def disponibilidad(request: Request, salon: int = None, db: Connection = Depends(get_db)):
     salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE ORDER BY orden").fetchall()
     ajustes = {r["clave"]: r["valor"] for r in db.execute("SELECT clave, valor FROM ajustes").fetchall()}
-    return templates.TemplateResponse("public/disponibilidad.html", {
+    return templates.TemplateResponse(request=request, name="public/disponibilidad.html", context={
         "request": request, 
         "salones": salones,
         "salon_seleccionado": salon,
@@ -114,13 +114,13 @@ from auth import verify_password, init_session, require_login, require_any_role,
 
 @app.get("/admin/login")
 def login_get(request: Request):
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="auth/login.html", context={"request": request})
 
 @app.post("/admin/login")
 def login_post(request: Request, email: str = Form(...), password: str = Form(...), db: Connection = Depends(get_db)):
     user = db.execute("SELECT * FROM usuarios WHERE LOWER(email) = LOWER(%s)", (email,)).fetchone()
     if not user or not user["activo"] or not verify_password(password, user["password_hash"]):
-        return templates.TemplateResponse("auth/login.html", {"request": request, "error": "Credenciales inválidas"}, status_code=401)
+        return templates.TemplateResponse(request=request, name="auth/login.html", context={"request": request, "error": "Credenciales inválidas"}, status_code=401)
     
     init_session(request, user["id"], user["rol"])
     db.execute("UPDATE usuarios SET ultimo_acceso = NOW() WHERE id = %s", (user["id"],))
@@ -155,7 +155,7 @@ def admin_panel(request: Request, db: Connection = Depends(get_db)):
     for p in proximas:
         p["salon"] = salones_map.get(p["salon_id"], "N/A")
         
-    return templates.TemplateResponse("admin/panel.html", {
+    return templates.TemplateResponse(request=request, name="admin/panel.html", context={
         "request": request,
         "reservas_hoy": reservas_hoy,
         "proximas": proximas
@@ -170,13 +170,13 @@ def admin_reservas(request: Request, db: Connection = Depends(get_db)):
         JOIN salones s ON r.salon_id = s.id
         ORDER BY r.fecha DESC, r.hora_inicio DESC
     """).fetchall()
-    return templates.TemplateResponse("admin/reservas.html", {"request": request, "reservas": reservas})
+    return templates.TemplateResponse(request=request, name="admin/reservas.html", context={"request": request, "reservas": reservas})
 
 @app.get("/admin/reservas/nueva")
 def admin_reservas_nueva(request: Request, db: Connection = Depends(get_db)):
     require_role(request, "ADMINISTRACION")
     salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE").fetchall()
-    return templates.TemplateResponse("admin/reserva_form.html", {"request": request, "salones": salones, "reserva": None})
+    return templates.TemplateResponse(request=request, name="admin/reserva_form.html", context={"request": request, "salones": salones, "reserva": None})
 
 @app.post("/admin/reservas")
 async def admin_reservas_post(
@@ -214,7 +214,7 @@ async def admin_reservas_post(
             
     except ValueError as e:
         salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE").fetchall()
-        return templates.TemplateResponse("admin/reserva_form.html", {"request": request, "salones": salones, "error": str(e)}, status_code=400)
+        return templates.TemplateResponse(request=request, name="admin/reserva_form.html", context={"request": request, "salones": salones, "error": str(e)}, status_code=400)
         
     return RedirectResponse(url="/admin/reservas", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -243,13 +243,13 @@ def admin_agenda(request: Request, db: Connection = Depends(get_db)):
         LEFT JOIN salones s ON e.salon_id = s.id
         ORDER BY e.fecha DESC, e.hora_inicio DESC
     """).fetchall()
-    return templates.TemplateResponse("admin/agenda.html", {"request": request, "eventos": eventos})
+    return templates.TemplateResponse(request=request, name="admin/agenda.html", context={"request": request, "eventos": eventos})
 
 @app.get("/admin/agenda/nuevo")
 def admin_agenda_nuevo(request: Request, db: Connection = Depends(get_db)):
     require_any_role(request, ["ADMINISTRACION", "COMISION_DIRECTIVA"])
     salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE").fetchall()
-    return templates.TemplateResponse("admin/evento_form.html", {"request": request, "salones": salones, "evento": None})
+    return templates.TemplateResponse(request=request, name="admin/evento_form.html", context={"request": request, "salones": salones, "evento": None})
 
 import uuid
 from dateutil.relativedelta import relativedelta
@@ -274,7 +274,7 @@ async def admin_agenda_post(
     
     if (hora_inicio and not hora_fin) or (hora_fin and not hora_inicio):
         salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE").fetchall()
-        return templates.TemplateResponse("admin/evento_form.html", {"request": request, "salones": salones, "error": "Debe especificar hora de inicio y fin, o dejar ambas vacías (día completo)."}, status_code=400)
+        return templates.TemplateResponse(request=request, name="admin/evento_form.html", context={"request": request, "salones": salones, "error": "Debe especificar hora de inicio y fin, o dejar ambas vacías (día completo)."}, status_code=400)
     
     # Generar ocurrencias
     fechas = [fecha]
@@ -315,7 +315,7 @@ async def admin_agenda_post(
                 
     except ValueError as e:
         salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE").fetchall()
-        return templates.TemplateResponse("admin/evento_form.html", {"request": request, "salones": salones, "error": f"Conflicto: {str(e)}"}, status_code=400)
+        return templates.TemplateResponse(request=request, name="admin/evento_form.html", context={"request": request, "salones": salones, "error": f"Conflicto: {str(e)}"}, status_code=400)
         
     return RedirectResponse(url="/admin/agenda", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -331,7 +331,7 @@ async def admin_agenda_cancelar(request: Request, id: int, db: Connection = Depe
 def admin_calendario(request: Request, db: Connection = Depends(get_db)):
     user_id = require_any_role(request, ["ADMINISTRACION", "COMISION_DIRECTIVA"])
     salones = db.execute("SELECT id, nombre FROM salones WHERE activo = TRUE").fetchall()
-    return templates.TemplateResponse("admin/calendario.html", {"request": request, "salones": salones})
+    return templates.TemplateResponse(request=request, name="admin/calendario.html", context={"request": request, "salones": salones})
 
 @app.get("/admin/api/calendario")
 def admin_api_calendario(
@@ -376,7 +376,7 @@ def admin_api_calendario(
 def admin_salones(request: Request, db: Connection = Depends(get_db)):
     require_role(request, "ADMINISTRACION")
     salones = db.execute("SELECT * FROM salones ORDER BY orden").fetchall()
-    return templates.TemplateResponse("admin/salones.html", {"request": request, "salones": salones})
+    return templates.TemplateResponse(request=request, name="admin/salones.html", context={"request": request, "salones": salones})
 
 @app.get("/admin/historial")
 def admin_historial(request: Request, db: Connection = Depends(get_db)):
@@ -387,13 +387,13 @@ def admin_historial(request: Request, db: Connection = Depends(get_db)):
         LEFT JOIN usuarios u ON a.usuario_id = u.id
         ORDER BY a.creado_en DESC LIMIT 100
     """).fetchall()
-    return templates.TemplateResponse("admin/historial.html", {"request": request, "logs": logs})
+    return templates.TemplateResponse(request=request, name="admin/historial.html", context={"request": request, "logs": logs})
 
 @app.get("/admin/configuracion")
 def admin_configuracion(request: Request, db: Connection = Depends(get_db)):
     require_role(request, "ADMINISTRACION")
     ajustes = {r["clave"]: r["valor"] for r in db.execute("SELECT clave, valor FROM ajustes").fetchall()}
-    return templates.TemplateResponse("admin/configuracion.html", {"request": request, "ajustes": ajustes})
+    return templates.TemplateResponse(request=request, name="admin/configuracion.html", context={"request": request, "ajustes": ajustes})
 
 @app.post("/admin/configuracion")
 async def admin_configuracion_post(request: Request, db: Connection = Depends(get_db)):
@@ -448,7 +448,7 @@ def exportar_reservas(request: Request, db: Connection = Depends(get_db)):
 def admin_cuenta(request: Request, db: Connection = Depends(get_db)):
     user_id = require_login(request)
     user = db.execute("SELECT * FROM usuarios WHERE id = %s", (user_id,)).fetchone()
-    return templates.TemplateResponse("admin/cuenta.html", {"request": request, "user": user})
+    return templates.TemplateResponse(request=request, name="admin/cuenta.html", context={"request": request, "user": user})
 
 @app.post("/admin/cuenta/password")
 async def admin_cuenta_password(
@@ -462,7 +462,7 @@ async def admin_cuenta_password(
     
     user = db.execute("SELECT * FROM usuarios WHERE id = %s", (user_id,)).fetchone()
     if not verify_password(password_actual, user["password_hash"]):
-        return templates.TemplateResponse("admin/cuenta.html", {"request": request, "user": user, "error": "Contraseña actual incorrecta"}, status_code=400)
+        return templates.TemplateResponse(request=request, name="admin/cuenta.html", context={"request": request, "user": user, "error": "Contraseña actual incorrecta"}, status_code=400)
     
     db.execute("UPDATE usuarios SET password_hash = %s WHERE id = %s", (get_password_hash(password_nueva), user_id))
     return RedirectResponse(url="/admin/cuenta?success=1", status_code=status.HTTP_303_SEE_OTHER)
