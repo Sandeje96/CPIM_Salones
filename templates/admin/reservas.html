@@ -37,13 +37,13 @@
                     </span>
                 </td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
-                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: {% if r.estado_pago == 'PAGADO' %}var(--success-soft); color: var(--success){% else %}var(--warning-soft); color: var(--warning){% endif %}">
+                    <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: {% if r.estado_pago == 'PAGADO' %}var(--success-soft); color: var(--success){% elif r.estado_pago == 'EXENTO' %}var(--surface-secondary); color: var(--text-secondary){% else %}var(--warning-soft); color: var(--warning){% endif %}">
                         {{ r.estado_pago }}
                     </span>
                 </td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
                     {% if request.session.rol == 'ADMINISTRACION' %}
-                        {% if r.estado_pago != 'PAGADO' and r.estado_reserva != 'CANCELADO' %}
+                        {% if r.estado_pago != 'PAGADO' and r.estado_pago != 'EXENTO' and r.estado_reserva != 'CANCELADO' %}
                         <form method="POST" action="/admin/reservas/{{ r.id }}/pagar" style="display:inline;" onsubmit="return confirm('¿Marcar como pagado?');">
                             <input type="hidden" name="csrf_token" value="{{ request.session.csrf_token }}">
                             <button type="submit" class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;">Pagar</button>

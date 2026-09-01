@@ -24,6 +24,19 @@ async def lifespan(app: FastAPI):
         if os.path.exists(schema_path):
             with open(schema_path, "r", encoding="utf-8") as f:
                 conn.execute(f.read())
+                
+        # Migración: actualizar constraint de estado_pago
+        with conn.transaction():
+            cur = conn.execute("""
+                SELECT conname
+                FROM pg_constraint
+                WHERE conrelid = 'reservas'::regclass
+                AND pg_get_constraintdef(oid) LIKE '%estado_pago%'
+            """)
+            for row in cur.fetchall():
+                conn.execute(f"ALTER TABLE reservas DROP CONSTRAINT {row['conname']}")
+            
+            conn.execute("ALTER TABLE reservas ADD CONSTRAINT reservas_estado_pago_check CHECK (estado_pago IN ('PENDIENTE', 'PAGADO', 'EXENTO'))")
     yield
     pool.close()
 

@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS reservas (
                         CHECK (estado_reserva IN ('RESERVADO', 'CANCELADO')),
 
     estado_pago         TEXT NOT NULL DEFAULT 'PENDIENTE'
-                        CHECK (estado_pago IN ('PENDIENTE', 'PAGADO')),
+                        CHECK (estado_pago IN ('PENDIENTE', 'PAGADO', 'EXENTO')),
 
     importe             NUMERIC(12,2) NOT NULL DEFAULT 0,
     observaciones       TEXT NOT NULL DEFAULT '',
