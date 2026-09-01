@@ -16,9 +16,8 @@
         <p style="font-weight: 500; font-size: 14px; margin-bottom: 5px;">Capacidad: {{ s.capacidad }}</p>
         <p class="card-desc" style="font-size: 14px;">{{ s.descripcion }}</p>
         
-        <div class="card-actions">
-            <!-- En V1, solo mostramos la info base, no implementamos todo el CRUD complejo acá para mantenerlo simple según spec -->
-            <span style="font-size: 12px; color: var(--text-secondary);">La edición de salones se habilitará en la versión extendida.</span>
+        <div class="card-actions" style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+            <a href="/admin/salones/{{ s.id }}/editar" class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Editar Salón</a>
         </div>
     </div>
     {% endfor %}

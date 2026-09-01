@@ -378,6 +378,34 @@ def admin_salones(request: Request, db: Connection = Depends(get_db)):
     salones = db.execute("SELECT * FROM salones ORDER BY orden").fetchall()
     return templates.TemplateResponse(request=request, name="admin/salones.html", context={"request": request, "salones": salones})
 
+@app.get("/admin/salones/{id}/editar")
+def admin_salones_editar_get(request: Request, id: int, db: Connection = Depends(get_db)):
+    require_role(request, "ADMINISTRACION")
+    salon = db.execute("SELECT * FROM salones WHERE id = %s", (id,)).fetchone()
+    if not salon:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(request=request, name="admin/salon_form.html", context={"request": request, "salon": salon})
+
+@app.post("/admin/salones/{id}/editar")
+async def admin_salones_editar_post(request: Request, id: int, db: Connection = Depends(get_db)):
+    user_id = require_role(request, "ADMINISTRACION")
+    await verify_csrf(request)
+    
+    form = await request.form()
+    nombre = form.get("nombre")
+    capacidad = int(form.get("capacidad", 0))
+    descripcion = form.get("descripcion", "")
+    activo = form.get("activo") == "on"
+    
+    db.execute("""
+        UPDATE salones 
+        SET nombre = %s, capacidad = %s, descripcion = %s, activo = %s
+        WHERE id = %s
+    """, (nombre, capacidad, descripcion, activo, id))
+    
+    db.execute("INSERT INTO auditoria (usuario_id, entidad, entidad_id, accion) VALUES (%s, 'salon', %s, 'EDITAR_SALON')", (user_id, id))
+    return RedirectResponse(url="/admin/salones", status_code=status.HTTP_303_SEE_OTHER)
+
 @app.get("/admin/historial")
 def admin_historial(request: Request, db: Connection = Depends(get_db)):
     require_role(request, "ADMINISTRACION")
