@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let html = '<ul style="list-style: none; padding: 0;">';
         blocks.forEach(b => {
-            const time = b.hora_inicio ? `${b.hora_inicio} - ${b.hora_fin}` : 'Día Completo';
+            const time = b.hora_inicio ? `${b.hora_inicio} - ${b.hora_fin}` : 'No especifica';
             const badge = b.tipo === 'RESERVA' ? 'var(--cpim-primary)' : 'var(--warning)';
             html += `
                 <li style="padding: 15px; border: 1px solid var(--border); margin-bottom: 10px; border-radius: var(--radius-sm);">

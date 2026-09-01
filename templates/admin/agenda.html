@@ -24,13 +24,13 @@
             <tr>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ e.fecha }}</td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
-                    {% if e.hora_inicio %}{{ e.hora_inicio.strftime('%H:%M') }} - {{ e.hora_fin.strftime('%H:%M') }}{% else %}Día completo{% endif %}
+                    {% if e.hora_inicio %}{{ e.hora_inicio.strftime('%H:%M') }} - {{ e.hora_fin.strftime('%H:%M') }}{% else %}No especifica{% endif %}
                 </td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
                     <strong>{{ e.titulo }}</strong><br>
                     <small style="color: var(--text-secondary);">{{ e.tipo }}</small>
                 </td>
-                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ e.salon_nombre or '-' }}</td>
+                <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ e.salon_nombre or 'Sin uso de salón' }}</td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
                     {% if e.cancelado %}
                     <span style="padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: var(--border); color: var(--text-secondary);">CANCELADO</span>

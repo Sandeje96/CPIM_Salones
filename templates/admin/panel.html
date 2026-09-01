@@ -27,7 +27,7 @@
             <tr>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ p.fecha }}</td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
-                    {% if p.hora_inicio %}{{ p.hora_inicio.strftime('%H:%M') }} - {{ p.hora_fin.strftime('%H:%M') }}{% else %}Día completo{% endif %}
+                    {% if p.hora_inicio %}{{ p.hora_inicio.strftime('%H:%M') }} - {{ p.hora_fin.strftime('%H:%M') }}{% else %}No especifica{% endif %}
                 </td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ p.salon }}</td>
                 <td style="padding: 15px 20px; border-bottom: 1px solid var(--border);">{{ p.titulo }}</td>

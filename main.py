@@ -153,7 +153,7 @@ def admin_panel(request: Request, db: Connection = Depends(get_db)):
     # Salones para nombres
     salones_map = {s["id"]: s["nombre"] for s in db.execute("SELECT id, nombre FROM salones").fetchall()}
     for p in proximas:
-        p["salon"] = salones_map.get(p["salon_id"], "N/A")
+        p["salon"] = salones_map.get(p["salon_id"], "Sin uso de salón")
         
     return templates.TemplateResponse(request=request, name="admin/panel.html", context={
         "request": request,
@@ -363,7 +363,7 @@ def admin_api_calendario(
     
     eventos_completos = []
     for o in (reservas + eventos):
-        o["salon_nombre"] = salones_map.get(o["salon_id"], "Sin Salón")
+        o["salon_nombre"] = salones_map.get(o["salon_id"], "Sin uso de salón")
         # Asegurar formato string
         o["fecha"] = o["fecha"].isoformat()
         o["hora_inicio"] = o["hora_inicio"].strftime('%H:%M') if o["hora_inicio"] else None
