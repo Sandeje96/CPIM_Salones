@@ -110,7 +110,7 @@ def api_disponibilidad(
 
 from fastapi import Form, status
 from fastapi.responses import RedirectResponse
-from auth import verify_password, init_session, require_login, require_any_role, verify_csrf
+from auth import verify_password, init_session, require_login, require_role, require_any_role, verify_csrf
 
 @app.get("/admin/login")
 def login_get(request: Request):
